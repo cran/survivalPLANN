@@ -1,0 +1,11 @@
+21be4f306f3e8c4d85752fe6375739b4 *DESCRIPTION
+89327cf2a6760d40d3fb42c5d06334e0 *NAMESPACE
+8b1fb5a193ad7d9c484b398f165fc9a3 *R/predict.survivalPLANN.R
+faf4be01dfc4d7899675fec38d92ca68 *R/print.survivalPLANN.R
+1067bfd2d6f28ccb7271c842d3bc759c *R/survivalPLANN.R
+c3700a9bbe0bf8d3975bab7f46d02907 *README.md
+d1f70aca1ea69ecd271bab0797e1f727 *data/dataK.RData
+eff2bbfd0ae66f65a379dfcf85960406 *man/dataK.Rd
+e4c59a6b3d303bf4e85aa01d8d3546a2 *man/predict.survivalPLANN.Rd
+5dfc4ead6aaf3722bb78a5efd72f6f8f *man/print.survivalPLANN.Rd
+ddcd9d150f9754bc17b70c91de96cf30 *man/survivalPLANN.Rd
