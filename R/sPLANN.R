@@ -1,5 +1,5 @@
 
-survivalPLANN <- function(formula, data, inter, size = 32, decay = 0.01,
+sPLANN <- function(formula, data, pro.time=NULL, inter, size = 32, decay = 0.01,
                           maxit =100, MaxNWts=10000, trace = FALSE, ...)
 {
   
@@ -30,19 +30,24 @@ survivalPLANN <- function(formula, data, inter, size = 32, decay = 0.01,
     cova <- cova[na, ]  
   }
   
+  data <- data[na,]
+  
   #### making of intervals from PLANN
   
-  intervals <- unique(c(0, seq(inter,max(time),by=inter), max(time)))
+  if (is.null(pro.time)) {pro.time <- max(time[event==1])} # modif
+  # if (is.null(pro.time)) {pro.time <- max(time)} # modif 
   
-  data <- data[na,]
+  intervals <- unique(c(0, seq(inter, pro.time, by=inter), pro.time)) # modif
   
   #in which interval the time t is :  
   data$Intervals = findInterval(time, intervals, left.open = TRUE)
   
-  data_dup <- data[rep(seq_len(nrow(data)), data$Intervals), ]
-  data_dup$Intervals <- ave(1:nrow(data_dup), data_dup[as.character(formula[[2]][2])], FUN = seq_along)
-  
-  
+  data$id <- seq_len(nrow(data))
+  data_dup <- data[rep(data$id, data$Intervals), ]
+  data_dup$id <- rep(data$id, data$Intervals)
+  data_dup$Intervals <- ave(data_dup$id, data_dup$id, FUN = seq_along)
+  data_dup <- data_dup[,-dim(data_dup)[2]] 
+ 
   modify_column = function(column) {
     if (length(column)==1){
       column = column
@@ -65,8 +70,7 @@ survivalPLANN <- function(formula, data, inter, size = 32, decay = 0.01,
   if( length( attr( terms(formula), "term.labels" ) )  == 0){
     formulaInt = as.formula(paste(as.character(formula[[2]][3]),"~",
                                   " Intervals"))
-  }
-else{
+  }else{ #chgt
   formulaInt = as.formula(paste(as.character(formula[[2]][3]),"~", 
                           paste(attr(terms(formula), "term.labels"),
                           collapse = " + "),
@@ -78,7 +82,6 @@ else{
     dup_count <- as.numeric(table( floor(as.numeric(rownames(data_dup))) ) )
     weights <- rep(weights,dup_count)
     args$weights = weights
-    # print(length(args$weights)) 
   }
 
   survnet <- do.call(nnet, c(list(formula = formulaInt, data = data_dup, size = size, maxit = maxit, 
@@ -95,11 +98,12 @@ else{
               maxit = maxit,
               MaxNWts = MaxNWts,
               coefnames = gsub("\\+", "", attr(terms(formula), "term.labels")),
-              y = cbind(time = time, status = event),
+              y = cbind(time, event),
               x = cova,
               intervals = intervals,
+              pro.time = pro.time, #pour calcul logll predictRS
               missing = !na
               )
-  class(res) <- "survivalPLANN"
+  class(res) <- "sPLANN"
   return(res)
 }
